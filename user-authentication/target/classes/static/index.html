@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LankaRail - Railway Reservation System</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .hero-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 100px 0;
+        }
+        .feature-card {
+            transition: transform 0.3s;
+            border: none;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .feature-card:hover {
+            transform: translateY(-5px);
+        }
+        .btn-custom {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            border: none;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <div class="container">
+        <a class="navbar-brand" href="index.html">🚆 LankaRail</a>
+        <div class="navbar-nav ms-auto">
+            <a class="nav-link" href="login.html">Login</a>
+            <a class="nav-link" href="register.html">Register</a>
+        </div>
+    </div>
+</nav>
+
+<div class="hero-section text-center">
+    <div class="container">
+        <h1 class="display-4 mb-4">Welcome to LankaRail</h1>
+        <p class="lead mb-4">Sri Lanka's Premier Railway Reservation System</p>
+        <a href="register.html" class="btn btn-light btn-lg me-2">Get Started</a>
+        <a href="login.html" class="btn btn-outline-light btn-lg">Login</a>
+    </div>
+</div>
+
+<div class="container my-5">
+    <div class="row">
+        <div class="col-md-4 mb-4">
+            <div class="card feature-card h-100">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Easy Booking</h5>
+                    <p class="card-text">Book your train tickets in just few clicks</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card feature-card h-100">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Secure Payment</h5>
+                    <p class="card-text">Safe and secure payment processing</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card feature-card h-100">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Real-time Updates</h5>
+                    <p class="card-text">Get instant updates on your bookings</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

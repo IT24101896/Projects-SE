@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Management - LankaRail</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <style>
+        body {
+            background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)),
+            url('https://images.unsplash.com/photo-1508691268483-c2ba21fae1ed?auto=format&fit=crop&w=1920&q=80')
+            no-repeat center center fixed;
+            background-size: cover;
+            min-height: 100vh;
+            font-family: 'Poppins', sans-serif;
+            color: #ffffff;
+        }
+        .navbar {
+            background-color: rgba(220, 53, 69, 0.95) !important;
+            backdrop-filter: blur(10px);
+        }
+        .navbar-brand {
+            font-weight: 700;
+            color: #ffffff !important;
+        }
+        .nav-link {
+            color: #ffffff !important;
+            font-weight: 600;
+        }
+        .sidebar {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(15px);
+            min-height: calc(100vh - 56px);
+            padding: 30px 20px;
+            border-right: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .sidebar h4 {
+            color: #ffffff;
+            font-weight: 800;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        .sidebar .nav-link {
+            color: #ffffff !important;
+            padding: 12px 20px;
+            border-radius: 10px;
+            margin-bottom: 8px;
+            transition: all 0.3s;
+        }
+        .sidebar .nav-link:hover,
+        .sidebar .nav-link.active {
+            background: rgba(220, 53, 69, 0.8);
+            transform: translateX(5px);
+        }
+        .main-content {
+            padding: 30px;
+        }
+        .main-content h2 {
+            color: #ffffff;
+            font-weight: 800;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+        .card {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            border-radius: 15px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+            color: #ffffff;
+            margin-bottom: 20px;
+        }
+        .card-title {
+            color: #ffffff;
+            font-weight: 700;
+        }
+        .user-table {
+            margin-top: 20px;
+        }
+        .table {
+            color: #ffffff;
+        }
+        .table thead {
+            background: rgba(220, 53, 69, 0.3);
+        }
+        .table tbody tr {
+            background: rgba(255, 255, 255, 0.05);
+            transition: all 0.3s;
+        }
+        .table tbody tr:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: scale(1.01);
+        }
+        .form-select {
+            background: rgba(255, 255, 255, 0.9);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-dark">
+    <div class="container">
+        <a class="navbar-brand" href="admin-dashboard.html">🚆 LankaRail Admin</a>
+        <div class="navbar-nav ms-auto">
+            <a class="nav-link" href="profile.html">Profile</a>
+            <a class="nav-link" href="#" onclick="logout()">Logout</a>
+        </div>
+    </div>
+</nav>
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-3 sidebar">
+            <h4>Navigation</h4>
+            <ul class="nav flex-column">
+                <li class="nav-item">
+                    <a class="nav-link" href="passenger-dashboard.html">Dashboard</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" href="user-management.html">User Management</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="profile.html">My Profile</a>
+                </li>
+            </ul>
+        </div>
+        <div class="col-md-9 main-content">
+            <h2>User Management</h2>
+
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Filter Users</h5>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <select class="form-select" id="roleFilter" onchange="loadUsers()">
+                                <option value="">All Roles</option>
+                                <option value="PASSENGER">Passenger</option>
+                                <option value="STAFF">Staff</option>
+                                <option value="ADMIN">Admin</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <select class="form-select" id="statusFilter" onchange="loadUsers()">
+                                <option value="">All Status</option>
+                                <option value="true">Active</option>
+                                <option value="false">Inactive</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card user-table">
+                <div class="card-body">
+                    <h5 class="card-title">Users List</h5>
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Username</th>
+                                <th>Email</th>
+                                <th>Role</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                            </thead>
+                            <tbody id="usersTable">
+                            <!-- Users will be loaded here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Check authentication with backend
+    fetch('/api/auth/current-user', {
+        credentials: 'include'
+    })
+    .then(response => {
+        if (!response.ok) {
+            window.location.href = 'login.html';
+            throw new Error('Not authenticated');
+        }
+        return response.json();
+    })
+    .then(user => {
+        if (user.role !== 'ADMIN') {
+            alert('Access Denied! Admin privileges required.');
+            window.location.href = 'passenger-dashboard.html';
+        } else {
+            loadUsers();
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        window.location.href = 'login.html';
+    });
+
+    function loadUsers() {
+        const roleFilter = document.getElementById('roleFilter').value;
+        const statusFilter = document.getElementById('statusFilter').value;
+
+        let url = '/api/auth/admin/users';
+
+        fetch(url, {
+            credentials: 'include'
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Unauthorized');
+                }
+                return response.json();
+            })
+            .then(users => {
+                let filteredUsers = users;
+
+                if (roleFilter) {
+                    filteredUsers = filteredUsers.filter(user => user.role === roleFilter);
+                }
+
+                if (statusFilter) {
+                    filteredUsers = filteredUsers.filter(user => user.active.toString() === statusFilter);
+                }
+
+                displayUsers(filteredUsers);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Failed to load users. Access denied.');
+            });
+    }
+
+    function displayUsers(users) {
+        const tableBody = document.getElementById('usersTable');
+        tableBody.innerHTML = '';
+
+        users.forEach(user => {
+            const row = `
+                    <tr>
+                        <td>${user.id}</td>
+                        <td>${user.username}</td>
+                        <td>${user.email}</td>
+                        <td>
+                            <select class="form-select form-select-sm" onchange="updateRole(${user.id}, this.value)">
+                                <option value="PASSENGER" ${user.role === 'PASSENGER' ? 'selected' : ''}>Passenger</option>
+                                <option value="STAFF" ${user.role === 'STAFF' ? 'selected' : ''}>Staff</option>
+                                <option value="ADMIN" ${user.role === 'ADMIN' ? 'selected' : ''}>Admin</option>
+                            </select>
+                        </td>
+                        <td>
+                            <span class="badge ${user.active ? 'bg-success' : 'bg-danger'}">
+                                ${user.active ? 'Active' : 'Inactive'}
+                            </span>
+                        </td>
+                        <td>
+                            <div class="btn-group" role="group">
+                                <a href="user-detail.html?id=${user.id}" class="btn btn-sm btn-info" title="View Details">
+                                    <i class="bi bi-eye"></i> View
+                                </a>
+                                ${user.active ?
+                `<button class="btn btn-sm btn-warning" onclick="deactivateUser(${user.id})" title="Deactivate">
+                    <i class="bi bi-x-circle"></i> Deactivate
+                </button>` :
+                `<button class="btn btn-sm btn-success" onclick="activateUser(${user.id})" title="Activate">
+                    <i class="bi bi-check-circle"></i> Activate
+                </button>`
+            }
+                                <button class="btn btn-sm btn-danger" onclick="deleteUser(${user.id})" title="Delete">
+                                    <i class="bi bi-trash"></i> Delete
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            tableBody.innerHTML += row;
+        });
+    }
+
+    function updateRole(userId, newRole) {
+        if (confirm(`Are you sure you want to change this user's role to ${newRole}?`)) {
+            fetch(`/api/auth/admin/users/${userId}/role?newRole=${newRole}`, {
+                method: 'PUT',
+                credentials: 'include'
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Failed to update role');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    alert('Role updated successfully!');
+                    loadUsers();
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Failed to update role!');
+                    loadUsers();
+                });
+        } else {
+            loadUsers(); // Reload to reset dropdown
+        }
+    }
+
+    function deleteUser(userId) {
+        if (confirm('Are you sure you want to DELETE this user? This action cannot be undone!')) {
+            fetch(`/api/auth/admin/users/${userId}`, {
+                method: 'DELETE',
+                credentials: 'include'
+            })
+                .then(response => {
+                    if (response.ok) {
+                        alert('User deleted successfully!');
+                        loadUsers();
+                    } else {
+                        return response.text().then(text => {
+                            throw new Error(text || 'Failed to delete user');
+                        });
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Failed to delete user: ' + error.message);
+                });
+        }
+    }
+
+    function deactivateUser(userId) {
+        if (confirm('Are you sure you want to deactivate this user?')) {
+            fetch(`/api/auth/admin/users/${userId}/deactivate`, {
+                method: 'PUT',
+                credentials: 'include'
+            })
+                .then(response => {
+                    if (response.ok) {
+                        alert('User deactivated successfully!');
+                        loadUsers();
+                    } else {
+                        throw new Error('Failed to deactivate');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Failed to deactivate user!');
+                });
+        }
+    }
+
+    function activateUser(userId) {
+        if (confirm('Are you sure you want to activate this user?')) {
+            fetch(`/api/auth/admin/users/${userId}/activate`, {
+                method: 'PUT',
+                credentials: 'include'
+            })
+                .then(response => {
+                    if (response.ok) {
+                        alert('User activated successfully!');
+                        loadUsers();
+                    } else {
+                        throw new Error('Failed to activate');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Failed to activate user!');
+                });
+        }
+    }
+
+    function logout() {
+        fetch('/api/auth/logout', {
+            method: 'POST',
+            credentials: 'include'
+        })
+        .then(() => {
+            window.location.href = 'login.html';
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            window.location.href = 'login.html';
+        });
+    }
+</script>
+</body>
+</html>

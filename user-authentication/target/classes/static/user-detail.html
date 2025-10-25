@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Details - LankaRail Admin</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <style>
+        body {
+            background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)),
+            url('https://images.unsplash.com/photo-1508691268483-c2ba21fae1ed?auto=format&fit=crop&w=1920&q=80')
+            no-repeat center center fixed;
+            background-size: cover;
+            min-height: 100vh;
+            font-family: 'Poppins', sans-serif;
+            color: #ffffff;
+            padding-top: 80px;
+        }
+        .navbar {
+            background-color: rgba(220, 53, 69, 0.95) !important;
+            backdrop-filter: blur(10px);
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+        }
+        .navbar-brand {
+            font-weight: 700;
+            color: #ffffff !important;
+        }
+        .nav-link {
+            color: #ffffff !important;
+            font-weight: 600;
+        }
+        .user-detail-card {
+            max-width: 800px;
+            margin: 30px auto;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
+            color: #ffffff;
+        }
+        .card-header {
+            background: rgba(220, 53, 69, 0.8) !important;
+            border-radius: 20px 20px 0 0 !important;
+            padding: 20px;
+        }
+        .card-body {
+            padding: 30px;
+        }
+        label {
+            color: #f8f9fa;
+            font-weight: 600;
+        }
+        .h5 {
+            color: #ffffff;
+            font-weight: 700;
+        }
+    </style>
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-dark bg-danger">
+    <div class="container">
+        <a class="navbar-brand" href="admin-dashboard.html">🚆 Admin - User Details</a>
+        <div class="navbar-nav ms-auto">
+            <a class="nav-link" href="user-management.html">Back to Users</a>
+            <a class="nav-link" href="admin-dashboard.html">Dashboard</a>
+            <a class="nav-link" href="#" onclick="logout()">Logout</a>
+        </div>
+    </div>
+</nav>
+
+<div class="container">
+    <div class="card user-detail-card">
+        <div class="card-header bg-danger text-white">
+            <h4><i class="bi bi-person-circle"></i> User Details</h4>
+        </div>
+        <div class="card-body">
+            <div id="userDetails">
+                <div class="text-center">
+                    <div class="spinner-border" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card-footer">
+            <div class="btn-group" role="group">
+                <a href="user-management.html" class="btn btn-secondary">
+                    <i class="bi bi-arrow-left"></i> Back to List
+                </a>
+                <button class="btn btn-danger" id="deleteBtn" onclick="deleteUser()">
+                    <i class="bi bi-trash"></i> Delete User
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let currentUser = null;
+    let userId = null;
+
+    // Get user ID from URL
+    const urlParams = new URLSearchParams(window.location.search);
+    userId = urlParams.get('id');
+
+    if (!userId) {
+        alert('No user ID provided');
+        window.location.href = 'user-management.html';
+    }
+
+    // Check authentication and load user details
+    fetch('/api/auth/current-user', {
+        credentials: 'include'
+    })
+    .then(response => {
+        if (!response.ok) {
+            window.location.href = 'login.html';
+            throw new Error('Not authenticated');
+        }
+        return response.json();
+    })
+    .then(user => {
+        currentUser = user;
+        if (user.role !== 'ADMIN') {
+            alert('Access Denied! Admin privileges required.');
+            window.location.href = 'passenger-dashboard.html';
+        } else {
+            loadUserDetails();
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        window.location.href = 'login.html';
+    });
+
+    function loadUserDetails() {
+        fetch(`/api/auth/admin/users/${userId}`, {
+            credentials: 'include'
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Failed to load user details');
+            }
+            return response.json();
+        })
+        .then(user => {
+            displayUserDetails(user);
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            document.getElementById('userDetails').innerHTML = `
+                <div class="alert alert-danger">
+                    <i class="bi bi-exclamation-triangle"></i> Failed to load user details: ${error.message}
+                </div>
+            `;
+        });
+    }
+
+    function displayUserDetails(user) {
+        const statusBadge = user.active ? 
+            '<span class="badge bg-success">Active</span>' : 
+            '<span class="badge bg-danger">Inactive</span>';
+
+        const roleColor = {
+            'ADMIN': 'danger',
+            'STAFF': 'warning',
+            'PASSENGER': 'info'
+        };
+
+        document.getElementById('userDetails').innerHTML = `
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label class="text-muted">User ID</label>
+                    <p class="h5">${user.id}</p>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label class="text-muted">Status</label>
+                    <p class="h5">${statusBadge}</p>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label class="text-muted">Username</label>
+                    <p class="h5">${user.username}</p>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label class="text-muted">Email</label>
+                    <p class="h5">${user.email}</p>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label class="text-muted">Role</label>
+                    <p class="h5">
+                        <span class="badge bg-${roleColor[user.role]}">${user.role}</span>
+                    </p>
+                </div>
+            </div>
+
+            <hr>
+
+            <h5 class="mt-4"><i class="bi bi-gear"></i> Quick Actions</h5>
+            <div class="d-grid gap-2">
+                <button class="btn btn-${user.active ? 'warning' : 'success'}" onclick="toggleUserStatus(${user.id}, ${user.active})">
+                    <i class="bi bi-${user.active ? 'x-circle' : 'check-circle'}"></i> 
+                    ${user.active ? 'Deactivate User' : 'Activate User'}
+                </button>
+                <button class="btn btn-primary" onclick="changeRole(${user.id}, '${user.role}')">
+                    <i class="bi bi-person-badge"></i> Change Role
+                </button>
+            </div>
+        `;
+
+        // Disable delete button if trying to delete self
+        if (currentUser && currentUser.id === user.id) {
+            document.getElementById('deleteBtn').disabled = true;
+            document.getElementById('deleteBtn').innerHTML = '<i class="bi bi-trash"></i> Cannot Delete Self';
+        }
+    }
+
+    function toggleUserStatus(userId, isActive) {
+        const action = isActive ? 'deactivate' : 'activate';
+        const endpoint = `/api/auth/admin/users/${userId}/${action}`;
+
+        if (confirm(`Are you sure you want to ${action} this user?`)) {
+            fetch(endpoint, {
+                method: 'PUT',
+                credentials: 'include'
+            })
+            .then(response => {
+                if (response.ok) {
+                    alert(`User ${action}d successfully!`);
+                    loadUserDetails();
+                } else {
+                    throw new Error(`Failed to ${action} user`);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert(`Failed to ${action} user!`);
+            });
+        }
+    }
+
+    function changeRole(userId, currentRole) {
+        const newRole = prompt(`Current role: ${currentRole}\nEnter new role (PASSENGER, STAFF, ADMIN):`, currentRole);
+        
+        if (newRole && ['PASSENGER', 'STAFF', 'ADMIN'].includes(newRole.toUpperCase())) {
+            fetch(`/api/auth/admin/users/${userId}/role?newRole=${newRole.toUpperCase()}`, {
+                method: 'PUT',
+                credentials: 'include'
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Failed to update role');
+                }
+                return response.json();
+            })
+            .then(data => {
+                alert('Role updated successfully!');
+                loadUserDetails();
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Failed to update role!');
+            });
+        } else if (newRole) {
+            alert('Invalid role! Please enter PASSENGER, STAFF, or ADMIN.');
+        }
+    }
+
+    function deleteUser() {
+        if (currentUser.id == userId) {
+            alert('You cannot delete your own account!');
+            return;
+        }
+
+        if (confirm('Are you sure you want to DELETE this user? This action cannot be undone!')) {
+            fetch(`/api/auth/admin/users/${userId}`, {
+                method: 'DELETE',
+                credentials: 'include'
+            })
+            .then(response => {
+                if (response.ok) {
+                    alert('User deleted successfully!');
+                    window.location.href = 'user-management.html';
+                } else {
+                    return response.text().then(text => {
+                        throw new Error(text || 'Failed to delete user');
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Failed to delete user: ' + error.message);
+            });
+        }
+    }
+
+    function logout() {
+        fetch('/api/auth/logout', {
+            method: 'POST',
+            credentials: 'include'
+        })
+        .then(() => {
+            window.location.href = 'login.html';
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            window.location.href = 'login.html';
+        });
+    }
+</script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
